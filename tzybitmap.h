@@ -3,6 +3,7 @@
 /**
  * Bitmap file format reference, http://en.wikipedia.org/wiki/BMP_file_format
  */
+typedef uint8_t byte;
 
 /* BITMAPFILEHEADER structure */
 typedef struct {
@@ -24,7 +25,6 @@ typedef struct {
     int16_t     zeros[24];
 } t_BITMAPINFOHEADER;
 
-typedef uint8_t byte;
 typedef struct {
     byte blue;
     byte green;
@@ -40,9 +40,9 @@ typedef struct {
     t_pixel                 *pixel;
 } t_bitmap;
 
-void set_bitmap(t_bitmap, int i);
-void unset_bitmap(t_bitmap, int i);
-void get_bitmap(t_bitmap, int i);
-t_bitmap create_bitmap(int n);
+void set_bitmap(t_bitmap, int);
+void unset_bitmap(t_bitmap, int);
+int get_bitmap(t_bitmap, int);
+t_bitmap *create_bitmap(int);
 
 #endif
