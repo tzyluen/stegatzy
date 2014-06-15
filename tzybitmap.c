@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 #include "tzybitmap.h"
 
 
@@ -54,4 +55,29 @@ void read_bitmap_info_header(t_bitmap *bmp, FILE *img)
 
 void streamout_bitmap(t_bitmap *bmp)
 {
+    printf("Image:\n"
+           "header->sig_b: %d\n"
+           "header->sig_m: %d\n"
+           "header->file_size: %d\n"
+           "header->reserved1: %d\n"
+           "header->reserved2: %d\n"
+           "header->pixel_offset: %d\n",
+            bmp->header.sig_b, bmp->header.sig_m,
+            bmp->header.file_size, bmp->header.reserved1,
+            bmp->header.reserved2, bmp->header.pixel_offset);
+
+    printf("info_header->size: %d\n"
+           "info_header->width: %d\n"
+           "info_header->height: %d\n"
+           "info_header->color_planes: %d\n"
+           "info_header->bits_per_pixel: %d\n"
+           "info_header->zeros: ",
+            bmp->info_header.size, bmp->info_header.width,
+            bmp->info_header.height, bmp->info_header.color_planes,
+            bmp->info_header.bits_per_pixel);
+
+    int i;
+    for (i = 0; i < sizeof(bmp->info_header.zeros); ++i ) {
+        printf("%d%c", bmp->info_header.zeros[i], (i+1 > sizeof(bmp->info_header.zeros)) ? '\n' : ' ');
+    }
 }

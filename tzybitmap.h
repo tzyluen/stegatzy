@@ -38,6 +38,7 @@ typedef struct {
     t_BITMAPFILEHEADER      header;
     t_BITMAPINFOHEADER      info_header;
     t_pixel                 *pixel;
+    char                    *name;
 } t_bitmap;
 
 void set_bitmap(t_bitmap *, int);
