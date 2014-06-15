@@ -34,13 +34,12 @@ int read_bitmap_file(const char *file, t_bitmap *bmp)
     int error = 0;
     FILE *bmpfile = fopen(file, "rb");
     if (bmpfile == NULL)
-        return -1;
-    read_bitmap_file_header(bmp, bmpfile);
-    read_bitmap_info_header(bmp, bmpfile);
-
-    printf("(%d) %s\n", __LINE__, file);
-
-    if (strlen(bmp->name) <= 0)
+        error = -1;
+    if (read_bitmap_file_header(bmp, bmpfile))
+        error = -1;
+    if (read_bitmap_info_header(bmp, bmpfile))
+        error = -1;
+    if ((!error) && strlen(bmp->name) <= 0)
         strcpy(bmp->name, file);
 
     return error;
