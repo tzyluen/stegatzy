@@ -45,8 +45,8 @@ void set_bitmap(t_bitmap *, int);
 void unset_bitmap(t_bitmap *, int);
 int get_bitmap(t_bitmap *, int);
 t_bitmap *create_bitmap(int);
-void read_bitmap_file_header(t_bitmap *, FILE *);
-void read_bitmap_info_header(t_bitmap *, FILE *);
+int read_bitmap_file_header(t_bitmap *, FILE *);
+int read_bitmap_info_header(t_bitmap *, FILE *);
 void streamout_bitmap(t_bitmap *);
 int read_bitmap_file(const char *, t_bitmap *);
 
