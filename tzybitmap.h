@@ -59,6 +59,8 @@ int read_bitmap_file(const char *, t_bitmap *);
 int read_bitmap_file_header(t_bitmap *, FILE *);
 int read_bitmap_info_header(t_bitmap *, FILE *);
 int read_bitmap_data(t_bitmap *, FILE *);
+int hide(t_bitmap *, const char *);
+int unhide(t_bitmap *);
 void streamout_bitmap(t_bitmap *);
 
 #endif

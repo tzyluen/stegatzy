@@ -47,7 +47,7 @@ int read_bitmap_file(const char *file, t_bitmap *bmp)
     int error = 0;
     FILE *bmpfile = fopen(file, "rb");
     if (bmpfile == NULL)
-        error = -1;
+        return -1;
     if (read_bitmap_file_header(bmp, bmpfile))
         error = -1;
 
@@ -124,6 +124,21 @@ int read_bitmap_info_header(t_bitmap *bmp, FILE *img)
 int read_bitmap_data(t_bitmap *bmp, FILE *img)
 {
     //fread(&bmp->info_header.);
+    return 0;
+}
+
+
+
+int hide(t_bitmap *bmp, const char *s)
+{
+    printf("hide\n");
+    return 0;
+}
+
+
+int unhide(t_bitmap *bmp)
+{
+    printf("unhide\n");
     return 0;
 }
 

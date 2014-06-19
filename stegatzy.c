@@ -3,19 +3,32 @@
 #include <stdint.h>
 #include "tzybitmap.h"
 
+void usage();
 int main(int argc, char **argv)
 {
-    //t_bitmap *bmp = create_bitmap(150);
-    //set_bitmap(bmp, 1);
-    //unset_bitmap(bmp, 1);
-    //int i = get_bitmap(bmp, 1);
-    //printf("get_bitmap(bmp, 1): %d\n", i);
-    t_bitmap *bmp = (t_bitmap *)malloc(sizeof(t_bitmap));
-    int ret = read_bitmap_file("brucelee.bmp", bmp);
-    if (ret)
-        printf("-E- error code: %d\n", ret);
+    if (argc > 3 || argc < 2)
+        usage();
 
+    t_bitmap *bmp = (t_bitmap *)malloc(sizeof(t_bitmap));
+    int ret = read_bitmap_file(argv[1], bmp);
+    if (ret) {
+        printf("-E- error code: %d\n", ret);
+        exit(ret);
+    }
+
+    if (argc == 3)  /* hide */
+        hide(bmp, argv[2]);
+    if (argc == 2)  /* unhide */
+        unhide(bmp);
+    
     streamout_bitmap(bmp);
 
     return EXIT_SUCCESS;
+}
+
+
+void usage()
+{
+    printf("usage:\nstegatzy <bitmap file> \"secret message\"\n");
+    exit(1);
 }
