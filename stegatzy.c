@@ -12,7 +12,8 @@ int main(int argc, char **argv)
     //printf("get_bitmap(bmp, 1): %d\n", i);
     t_bitmap *bmp = (t_bitmap *)malloc(sizeof(t_bitmap));
     int ret = read_bitmap_file("brucelee.bmp", bmp);
-    printf("read_bitmap_file: %d\n", ret);
+    if (ret)
+        printf("-E- error code: %d\n", ret);
 
     streamout_bitmap(bmp);
 

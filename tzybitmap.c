@@ -50,10 +50,18 @@ int read_bitmap_file(const char *file, t_bitmap *bmp)
         error = -1;
     if (read_bitmap_file_header(bmp, bmpfile))
         error = -1;
+
+    /* if file ain't bitmap: BM */
+    if (bmp->header.type != 0x4D42)
+        error = -2;
+
     if (read_bitmap_info_header(bmp, bmpfile))
         error = -1;
+    if (read_bitmap_data(bmp, bmpfile))
+        error = -1;
+
     if (bmp->name == '\0') {
-        printf("bmp->name: %s\n", bmp->name);
+        //printf("bmp->name: %s\n", bmp->name);
         set_bitmap_filename(bmp, file);
     }
 
@@ -65,9 +73,8 @@ int read_bitmap_file_header(t_bitmap *bmp, FILE *img)
 {
     //if (fread(&bmp->header, sizeof(unsigned char), sizeof(t_BITMAPFILEHEADER), img) < 1)
     //    return -1;    /* couldn't read the file header */
-    if (fread(&bmp->header.sig_b, sizeof(unsigned char), sizeof(byte), img) < 1)
-        return -1;
-    if (fread(&bmp->header.sig_m, sizeof(unsigned char), sizeof(byte), img) < 1)
+
+    if (fread(&bmp->header.type, sizeof(unsigned char), sizeof(uint16_t), img) < 1)
         return -1;
     if (fread(&bmp->header.file_size, sizeof(unsigned char), sizeof(uint32_t), img) < 1)
         return -1;
@@ -86,6 +93,7 @@ int read_bitmap_info_header(t_bitmap *bmp, FILE *img)
 {
     //if (fread(&bmp->info_header, sizeof(unsigned char), sizeof(t_BITMAPINFOHEADER), img) < 1)
     //    return -1;    /* couldn't read the info header */
+    
     if (fread(&bmp->info_header.size, sizeof(unsigned char), sizeof(int32_t), img) < 1)
         return -1;
     if (fread(&bmp->info_header.width, sizeof(unsigned char), sizeof(int32_t), img) < 1)
@@ -113,21 +121,28 @@ int read_bitmap_info_header(t_bitmap *bmp, FILE *img)
 }
 
 
+int read_bitmap_data(t_bitmap *bmp, FILE *img)
+{
+    //fread(&bmp->info_header.);
+    return 0;
+}
+
+
 void streamout_bitmap(t_bitmap *bmp)
 {
     printf("Image: %s\n"
-           "header->sig_b: %c\n"
-           "header->sig_m: %c\n"
+           "===============================================\n"
+           "header->type: %x\n"
            "header->file_size: %"PRId32"\n"
            "header->reserved1: %d\n"
            "header->reserved2: %d\n"
            "header->pixel_offset: %"PRId32"\n",
-            bmp->name,
-            bmp->header.sig_b, bmp->header.sig_m,
+            bmp->name, bmp->header.type,
             bmp->header.file_size, bmp->header.reserved1,
             bmp->header.reserved2, bmp->header.pixel_offset);
 
-    printf("info_header->size: %"PRId32"\n"
+    printf("===============================================\n"
+           "info_header->size: %"PRId32"\n"
            "info_header->width: %"PRId32"\n"
            "info_header->height: %"PRId32"\n"
            "info_header->color_planes: %d\n"
