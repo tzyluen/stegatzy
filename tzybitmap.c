@@ -2,12 +2,25 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <inttypes.h>
 #include "tzybitmap.h"
 
 
 void set_bitmap(t_bitmap *bmp, int i)
 {
     printf("set_bitmap\n");
+}
+
+
+int set_bitmap_filename(t_bitmap *bmp, const char *s)
+{
+    char *new = (char *)malloc(sizeof(char) * strlen(s));
+    if (!new)
+        return -1;
+    strcpy(new, s);
+    bmp->name = new;
+
+    return 0;
 }
 
 
@@ -39,8 +52,10 @@ int read_bitmap_file(const char *file, t_bitmap *bmp)
         error = -1;
     if (read_bitmap_info_header(bmp, bmpfile))
         error = -1;
-    if ((!error) && strlen(bmp->name) <= 0)
-        strcpy(bmp->name, file);
+    if (bmp->name == '\0') {
+        printf("bmp->name: %s\n", bmp->name);
+        set_bitmap_filename(bmp, file);
+    }
 
     return error;
 }
@@ -48,17 +63,52 @@ int read_bitmap_file(const char *file, t_bitmap *bmp)
 
 int read_bitmap_file_header(t_bitmap *bmp, FILE *img)
 {
-    //size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
-    if (fread(&bmp->header, sizeof(unsigned char), sizeof(t_BITMAPFILEHEADER), img) < 1)
-        return -1;    /* couldn't read the file header */
+    //if (fread(&bmp->header, sizeof(unsigned char), sizeof(t_BITMAPFILEHEADER), img) < 1)
+    //    return -1;    /* couldn't read the file header */
+    if (fread(&bmp->header.sig_b, sizeof(unsigned char), sizeof(byte), img) < 1)
+        return -1;
+    if (fread(&bmp->header.sig_m, sizeof(unsigned char), sizeof(byte), img) < 1)
+        return -1;
+    if (fread(&bmp->header.file_size, sizeof(unsigned char), sizeof(uint32_t), img) < 1)
+        return -1;
+    if (fread(&bmp->header.reserved1, sizeof(unsigned char), sizeof(int16_t), img) < 1)
+        return -1;
+    if (fread(&bmp->header.reserved2, sizeof(unsigned char), sizeof(int16_t), img) < 1)
+        return -1;
+    if (fread(&bmp->header.pixel_offset, sizeof(unsigned char), sizeof(int32_t), img) < 1)
+        return -1;
+
     return 0;
 }
 
 
 int read_bitmap_info_header(t_bitmap *bmp, FILE *img)
 {
-    if (fread(&bmp->info_header, sizeof(unsigned char), sizeof(t_BITMAPINFOHEADER), img) < 1)
-        return -1;    /* couldn't read the info header */
+    //if (fread(&bmp->info_header, sizeof(unsigned char), sizeof(t_BITMAPINFOHEADER), img) < 1)
+    //    return -1;    /* couldn't read the info header */
+    if (fread(&bmp->info_header.size, sizeof(unsigned char), sizeof(int32_t), img) < 1)
+        return -1;
+    if (fread(&bmp->info_header.width, sizeof(unsigned char), sizeof(int32_t), img) < 1)
+        return -1;
+    if (fread(&bmp->info_header.height, sizeof(unsigned char), sizeof(int32_t), img) < 1)
+        return -1;
+    if (fread(&bmp->info_header.color_planes, sizeof(unsigned char), sizeof(int16_t), img) < 1)
+        return -1;
+    if (fread(&bmp->info_header.bits_per_pixel, sizeof(unsigned char), sizeof(int16_t), img) < 1)
+        return -1;
+    if (fread(&bmp->info_header.compression, sizeof(unsigned char), sizeof(int32_t), img) < 1)
+        return -1;
+    if (fread(&bmp->info_header.image_size, sizeof(unsigned char), sizeof(int32_t), img) < 1)
+        return -1;
+    if (fread(&bmp->info_header.horizontal, sizeof(unsigned char), sizeof(int32_t), img) < 1)
+        return -1;
+    if (fread(&bmp->info_header.vertical, sizeof(unsigned char), sizeof(int32_t), img) < 1)
+        return -1;
+    if (fread(&bmp->info_header.color_palette, sizeof(unsigned char), sizeof(int32_t), img) < 1)
+        return -1;
+    if (fread(&bmp->info_header.colors_used, sizeof(unsigned char), sizeof(int32_t), img) < 1)
+        return -1;
+
     return 0;
 }
 
@@ -66,28 +116,32 @@ int read_bitmap_info_header(t_bitmap *bmp, FILE *img)
 void streamout_bitmap(t_bitmap *bmp)
 {
     printf("Image: %s\n"
-           "header->sig_b: %d\n"
-           "header->sig_m: %d\n"
-           "header->file_size: %d\n"
+           "header->sig_b: %c\n"
+           "header->sig_m: %c\n"
+           "header->file_size: %"PRId32"\n"
            "header->reserved1: %d\n"
            "header->reserved2: %d\n"
-           "header->pixel_offset: %d\n",
-            bmp->name, bmp->header.sig_b, bmp->header.sig_m,
+           "header->pixel_offset: %"PRId32"\n",
+            bmp->name,
+            bmp->header.sig_b, bmp->header.sig_m,
             bmp->header.file_size, bmp->header.reserved1,
             bmp->header.reserved2, bmp->header.pixel_offset);
 
-    printf("info_header->size: %d\n"
-           "info_header->width: %d\n"
-           "info_header->height: %d\n"
+    printf("info_header->size: %"PRId32"\n"
+           "info_header->width: %"PRId32"\n"
+           "info_header->height: %"PRId32"\n"
            "info_header->color_planes: %d\n"
            "info_header->bits_per_pixel: %d\n"
-           "info_header->zeros: ",
+           "info_header->compression: %"PRId32"\n"
+           "info_header->image_size: %"PRId32"\n"
+           "info_header->horizontal: %"PRId32"\n"
+           "info_header->vertical: %"PRId32"\n"
+           "info_header->color_palette: %"PRId32"\n"
+           "info_header->colors_used: %"PRId32"\n",
             bmp->info_header.size, bmp->info_header.width,
             bmp->info_header.height, bmp->info_header.color_planes,
-            bmp->info_header.bits_per_pixel);
-
-    int i;
-    for (i = 0; i < sizeof(bmp->info_header.zeros); ++i ) {
-        printf("%d%c", bmp->info_header.zeros[i], (i+1 > sizeof(bmp->info_header.zeros)) ? '\n' : ' ');
-    }
+            bmp->info_header.bits_per_pixel, bmp->info_header.compression,
+            bmp->info_header.image_size, bmp->info_header.horizontal,
+            bmp->info_header.vertical, bmp->info_header.color_palette,
+            bmp->info_header.colors_used);
 }
