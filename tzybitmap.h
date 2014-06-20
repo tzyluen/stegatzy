@@ -4,9 +4,14 @@
  * Bitmap file format reference, http://en.wikipedia.org/wiki/BMP_file_format
  */
 
-#define E_BMP_INVALID_FILE   -2
-#define E_BMP_READ_ERROR     -1
+#define E_BMP_INVALID_FILE      -2
+#define E_BMP_READ_ERROR        -1
 
+#define BYTES_PER_PIXEL         3
+
+#define DEBUG_FILE_LINE         __FILE__, __LINE__
+#define DEBUG_STR               "%s:%d"
+#define ERROR_PRINT_ERR         fprintf(stderr, DEBUG_STR " errno: %d," " error: %s\n", DEBUG_FILE_LINE, errno, strerror(errno));
 
 typedef uint8_t byte;
 
@@ -22,8 +27,8 @@ typedef struct {
 /* BITMAPINFOHEADER structure */
 typedef struct {
     uint32_t size;           /* offset:14, size:4 bytes, size of this(DIB) header */
-    uint32_t width;          /* offset:18, size:4 bytes, bmp width in pixel (signed int) */
-    uint32_t height;         /* offset:22, size:4 bytes, bmp height in pixel (signed int) */  
+    int32_t width;          /* offset:18, size:4 bytes, bmp width in pixel (signed int) */
+    int32_t height;         /* offset:22, size:4 bytes, bmp height in pixel (signed int) */  
     uint16_t color_planes;   /* offset:26, size:2 bytes, the number of color planes must be 1 */
     uint16_t bits_per_pixel; /* offset:28, size:2 bytes, bits per pixel, i.e, 1,4,8,16,24,32 */
     uint32_t compression;    /* offset:30, size:4 bytes, compression method */
@@ -46,7 +51,7 @@ typedef struct {
 typedef struct {
     t_BITMAPFILEHEADER header;
     t_BITMAPINFOHEADER info_header;
-    t_pixel            *pixel;
+    t_pixel            **pixel;
     char               *name;
 } t_bitmap;
 

@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <inttypes.h>
+#include <errno.h>
 #include "tzybitmap.h"
 
 
@@ -123,10 +124,22 @@ int read_bitmap_info_header(t_bitmap *bmp, FILE *img)
 
 int read_bitmap_data(t_bitmap *bmp, FILE *img)
 {
-    //fread(&bmp->info_header.);
+    t_pixel **px = malloc(bmp->info_header.image_size);
+    if (px == NULL ) {
+        ERROR_PRINT_ERR;
+        return -1;
+    }
+
+    /*if (fread(*px, sizeof(t_pixel), bmp->info_header.image_size, img) != bmp->info_header.image_size) {
+        ERROR_PRINT_ERR;
+        return -1;
+    }*/
+
+    //**pixel = malloc(data_size)
+    //     return -1;
+
     return 0;
 }
-
 
 
 int hide(t_bitmap *bmp, const char *s)

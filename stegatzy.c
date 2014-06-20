@@ -1,9 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 #include "tzybitmap.h"
 
 void usage();
+
 int main(int argc, char **argv)
 {
     if (argc > 3 || argc < 2)
@@ -12,7 +16,7 @@ int main(int argc, char **argv)
     t_bitmap *bmp = (t_bitmap *)malloc(sizeof(t_bitmap));
     int ret = read_bitmap_file(argv[1], bmp);
     if (ret) {
-        printf("-E- error code: %d\n", ret);
+        ERROR_PRINT_ERR;
         exit(ret);
     }
 
