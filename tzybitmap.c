@@ -17,7 +17,7 @@ int set_bitmap_filename(t_bitmap *bmp, const char *s)
 {
     char *new = (char *)malloc(sizeof(char) * strlen(s));
     if (!new)
-        return -1;
+        return ENOMEM;
     strcpy(new, s);
     bmp->name = new;
 
@@ -43,100 +43,115 @@ t_bitmap *create_bitmap(int n)
 }
 
 
+/**
+ * return value:
+ * on success, return 0
+ * on error, return ENOENT if file isn't available, negative value if reading failed.
+ */
 int read_bitmap_file(const char *file, t_bitmap *bmp)
 {
-    int error = 0;
+    int ret;
     FILE *bmpfile = fopen(file, "rb");
     if (bmpfile == NULL)
-        return -1;
-    if (read_bitmap_file_header(bmp, bmpfile))
-        error = -1;
-
-    /* if file ain't bitmap: BM */
-    if (bmp->header.type != 0x4D42)
-        error = -2;
-
-    if (read_bitmap_info_header(bmp, bmpfile))
-        error = -1;
-    if (read_bitmap_data(bmp, bmpfile))
-        error = -1;
-
-    if (bmp->name == '\0') {
-        //printf("bmp->name: %s\n", bmp->name);
+        return ENOENT;
+    if ((ret = read_bitmap_file_header(bmp, bmpfile)))
+        return ret;
+    if (bmp->header.type != 0x4D42) /* if file ain't bitmap: BM */
+        return EFTYPE;
+    if ((ret = read_bitmap_info_header(bmp, bmpfile)))
+        return ret;
+    if ((ret = read_bitmap_data(bmp, bmpfile)))
+        return ret;
+    if (bmp->name == '\0')
         set_bitmap_filename(bmp, file);
-    }
 
-    return error;
+    return 0;
 }
 
 
+/**
+ * return value:
+ * on success, return 0.
+ * on error, return negative value.
+ */
 int read_bitmap_file_header(t_bitmap *bmp, FILE *img)
 {
     //if (fread(&bmp->header, sizeof(unsigned char), sizeof(t_BITMAPFILEHEADER), img) < 1)
     //    return -1;    /* couldn't read the file header */
 
-    if (fread(&bmp->header.type, sizeof(unsigned char), sizeof(uint16_t), img) < 1)
-        return -1;
-    if (fread(&bmp->header.file_size, sizeof(unsigned char), sizeof(uint32_t), img) < 1)
-        return -1;
-    if (fread(&bmp->header.reserved1, sizeof(unsigned char), sizeof(int16_t), img) < 1)
-        return -1;
-    if (fread(&bmp->header.reserved2, sizeof(unsigned char), sizeof(int16_t), img) < 1)
-        return -1;
-    if (fread(&bmp->header.pixel_offset, sizeof(unsigned char), sizeof(int32_t), img) < 1)
-        return -1;
+    int ret;
+    if ((ret = fread(&bmp->header.type, sizeof(unsigned char), sizeof(uint16_t), img)) < 1)
+        return ret;
+    if ((ret = fread(&bmp->header.file_size, sizeof(unsigned char), sizeof(uint32_t), img)) < 1)
+        return ret;
+    if ((ret = fread(&bmp->header.reserved1, sizeof(unsigned char), sizeof(int16_t), img)) < 1)
+        return ret;
+    if ((ret = fread(&bmp->header.reserved2, sizeof(unsigned char), sizeof(int16_t), img)) < 1)
+        return ret;
+    if ((ret = fread(&bmp->header.pixel_offset, sizeof(unsigned char), sizeof(int32_t), img)) < 1)
+        return ret;
 
     return 0;
 }
 
-
+/**
+ * return value:
+ * on success, return 0.
+ * on error, return negative value.
+ */
 int read_bitmap_info_header(t_bitmap *bmp, FILE *img)
 {
     //if (fread(&bmp->info_header, sizeof(unsigned char), sizeof(t_BITMAPINFOHEADER), img) < 1)
     //    return -1;    /* couldn't read the info header */
     
-    if (fread(&bmp->info_header.size, sizeof(unsigned char), sizeof(int32_t), img) < 1)
-        return -1;
-    if (fread(&bmp->info_header.width, sizeof(unsigned char), sizeof(int32_t), img) < 1)
-        return -1;
-    if (fread(&bmp->info_header.height, sizeof(unsigned char), sizeof(int32_t), img) < 1)
-        return -1;
-    if (fread(&bmp->info_header.color_planes, sizeof(unsigned char), sizeof(int16_t), img) < 1)
-        return -1;
-    if (fread(&bmp->info_header.bits_per_pixel, sizeof(unsigned char), sizeof(int16_t), img) < 1)
-        return -1;
-    if (fread(&bmp->info_header.compression, sizeof(unsigned char), sizeof(int32_t), img) < 1)
-        return -1;
-    if (fread(&bmp->info_header.image_size, sizeof(unsigned char), sizeof(int32_t), img) < 1)
-        return -1;
-    if (fread(&bmp->info_header.horizontal, sizeof(unsigned char), sizeof(int32_t), img) < 1)
-        return -1;
-    if (fread(&bmp->info_header.vertical, sizeof(unsigned char), sizeof(int32_t), img) < 1)
-        return -1;
-    if (fread(&bmp->info_header.color_palette, sizeof(unsigned char), sizeof(int32_t), img) < 1)
-        return -1;
-    if (fread(&bmp->info_header.colors_used, sizeof(unsigned char), sizeof(int32_t), img) < 1)
-        return -1;
+    int ret;
+    if ((ret = fread(&bmp->info_header.size, sizeof(unsigned char), sizeof(int32_t), img)) < 1)
+        return ret;
+    if ((ret = fread(&bmp->info_header.width, sizeof(unsigned char), sizeof(int32_t), img)) < 1)
+        return ret;
+    if ((ret = fread(&bmp->info_header.height, sizeof(unsigned char), sizeof(int32_t), img)) < 1)
+        return ret;
+    if ((ret = fread(&bmp->info_header.color_planes, sizeof(unsigned char), sizeof(int16_t), img)) < 1)
+        return ret;
+    if ((ret = fread(&bmp->info_header.bits_per_pixel, sizeof(unsigned char), sizeof(int16_t), img)) < 1)
+        return ret;
+    if ((ret = fread(&bmp->info_header.compression, sizeof(unsigned char), sizeof(int32_t), img)) < 1)
+        return ret;
+    if ((ret = fread(&bmp->info_header.image_size, sizeof(unsigned char), sizeof(int32_t), img)) < 1)
+        return ret;
+    if ((ret = fread(&bmp->info_header.horizontal, sizeof(unsigned char), sizeof(int32_t), img)) < 1)
+        return ret;
+    if ((ret = fread(&bmp->info_header.vertical, sizeof(unsigned char), sizeof(int32_t), img)) < 1)
+        return ret;
+    if ((ret = fread(&bmp->info_header.color_palette, sizeof(unsigned char), sizeof(int32_t), img)) < 1)
+        return ret;
+    if ((ret = fread(&bmp->info_header.colors_used, sizeof(unsigned char), sizeof(int32_t), img)) < 1)
+        return ret;
 
     return 0;
 }
 
 
+/**
+ * return value:
+ * on success, return 0.
+ * on error, return ENOMEM if failed to allocate memory. return EOVERFLOW if px memory overflow.
+ *           return if fread read size not equal to bitmap image size,
+ */
 int read_bitmap_data(t_bitmap *bmp, FILE *img)
 {
+    int ret;
     t_pixel **px = malloc(bmp->info_header.image_size);
-    if (px == NULL ) {
-        ERROR_PRINT_ERR;
-        return -1;
+    if (px == NULL)
+        return ENOMEM;
+    if ((ret = fread(px, sizeof(unsigned char), bmp->info_header.image_size, img)) < bmp->info_header.image_size)
+        ret = EOVERFLOW;
+    else if (ret != bmp->info_header.image_size) {
+        ERROR_PRINT_ERR
+        return ret;
     }
 
-    /*if (fread(*px, sizeof(t_pixel), bmp->info_header.image_size, img) != bmp->info_header.image_size) {
-        ERROR_PRINT_ERR;
-        return -1;
-    }*/
-
-    //**pixel = malloc(data_size)
-    //     return -1;
+    bmp->pixel = px;
 
     return 0;
 }
