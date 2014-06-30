@@ -1,10 +1,8 @@
 #ifndef TZYBITMAP_H
 #define TZYBITMAP_H
-/**
- * Bitmap file format reference, http://en.wikipedia.org/wiki/BMP_file_format
- */
 
 #define EFTYPE                  999
+#define BITS_PER_PIXEL          24
 #define BYTES_PER_PIXEL         3
 
 #define DEBUG_FILE_LINE         __FILE__, __LINE__
@@ -13,7 +11,10 @@
 
 typedef uint8_t byte;
 
-/* BITMAPFILEHEADER structure */
+/**
+ * Bitmap file format reference, http://en.wikipedia.org/wiki/BMP_file_format:
+ *
+ * BITMAPFILEHEADER structure */
 typedef struct {
     uint16_t type;           /* offset:0, size:2 bytes, types: {BM, BA, CI, CP, IC, PT} */
     uint32_t file_size;      /* offset:2, size:4 bytes, bmp filesize in bytes */
@@ -50,7 +51,7 @@ typedef struct {
 typedef struct {
     t_BITMAPFILEHEADER header;
     t_BITMAPINFOHEADER info_header;
-    t_pixel            **pixel;
+    t_pixel            *pixel;
     char               *name;
 } t_bitmap;
 
@@ -58,13 +59,18 @@ void set_bitmap(t_bitmap *, int);
 int set_bitmap_filename(t_bitmap *, const char *);
 void unset_bitmap(t_bitmap *, int);
 int get_bitmap(t_bitmap *, int);
-t_bitmap *create_bitmap(int);
+t_bitmap *create_bitmap(const char *, int, int, int);
+size_t write_bitmap_file(const char *, t_bitmap *);
+size_t write_bitmap_pixel_data(t_bitmap *, FILE *);
 int read_bitmap_file(const char *, t_bitmap *);
 int read_bitmap_file_header(t_bitmap *, FILE *);
 int read_bitmap_info_header(t_bitmap *, FILE *);
 int read_bitmap_data(t_bitmap *, FILE *);
 int hide(t_bitmap *, const char *);
 int unhide(t_bitmap *);
+size_t get_rowsize(int);
+size_t get_pixel_array_size(int, int);
+size_t padding_check(t_bitmap *);
 void streamout_bitmap(t_bitmap *);
 
 #endif

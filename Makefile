@@ -6,4 +6,4 @@ all:
 	$(CXX) $(CXXFLAGS) tzybitmap.o stegatzy.c -o stegatzy
 
 clean:
-	rm -f *o stegatzy
+	rm -f *o stegatzy tzy.bmp
