@@ -37,7 +37,7 @@ int get_bitmap(t_bitmap *bmp, int i)
 }
 
 
-t_bitmap *create_bitmap(const char *name, int width, int height, int depth)
+t_bitmap *create_bitmap(const char *name, int width, int height, int depth, t_pixel rgb)
 {
     t_bitmap *bmp = malloc(sizeof(t_bitmap));
     if (set_bitmap_filename(bmp, name))
@@ -73,9 +73,9 @@ t_bitmap *create_bitmap(const char *name, int width, int height, int depth)
     int h, w, z = 0;
     for (h = 0; h < height; ++h) {
         for (w = 0; w < width; ++w) {
-            pixel[z].blue = 0xFF;
-            pixel[z].green = 0xFF;
-            pixel[z].red = 0xFF;
+            pixel[z].blue = rgb.blue;
+            pixel[z].green = rgb.green;
+            pixel[z].red = rgb.red;
             ++z;
         }
     }

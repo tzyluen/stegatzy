@@ -40,7 +40,8 @@ void test_create_bitmap()
 {
     int ret = 0;
     printf("===============================================\n");
-    t_bitmap *bmp = create_bitmap("tzy", 201, 201, 24);
+    t_pixel rgb = {.red=0x66, .green=0xB2, .blue=0xFF};
+    t_bitmap *bmp = create_bitmap("tzy", 201, 201, 24, rgb);
     write_bitmap_file("tzy.bmp", bmp);
     free(bmp);
 
