@@ -21,14 +21,30 @@
 #        
 # And pixel array's size = x * height
 
-for width in range(1, 1024):
-    #print "%d" % ((width * 24 + 31) / 32 * 4)
-    n = width * 24
-    r = n % 32
-    if (r != 0):
-        p = 32 - r
-        x = n + p
-        ps = x * width  # assuming height == width
-        print "width->%d, %d, %d, %d" %(width, p, x, ps)
-    else:
-        print "width->%d, %d, %d, %d" %(width, 0, n, n * width)
+### print in bits
+def method_one():
+    for width in range(1, 1024):
+        #print "%d" % ((width * 24 + 31) / 32 * 4)
+        n = width * 24
+        r = n % 32
+        if (r != 0):
+            p = 32 - r
+            x = n + p
+            ps = x * width
+            height = width  # assume height == width
+            print "width->%d, height->%d, padding->%d bits, rowsize->%d bits, pixelstorage->%d bits" %(width, height, p, x, ps)
+        else:
+            print "width->%d, height->%d, padding->%d bits, rowsize->%d bits, pixelstorage->%d bits" %(width, height, 0, n, n * width)
+
+
+### print in bytes
+def method_two():
+    for width in range(1, 1024):
+        height = width  # assume height == width
+        n = ((width * 24 + 31) / 32) * 4;
+        p = n - width * 3;
+        print "width->%d, padding->%d bytes, rowsize->%d bytes" %(width, p, n)
+
+
+#method_one()
+method_two()
