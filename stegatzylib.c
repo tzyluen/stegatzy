@@ -8,8 +8,6 @@
 
 size_t stegatzy_by_padding(FILE *fp, const char *s)
 {
-    printf("  stegatzy_by_padding\n");
-
     t_bitmap *bmp = malloc(sizeof(t_bitmap));
     read_bitmap_file(fp, bmp);
     size_t padding_size = padding_check(bmp);
@@ -31,9 +29,32 @@ size_t stegatzy_by_padding(FILE *fp, const char *s)
         }
     }
 
-    stream_padding_contents(fp, bmp, padding_check(bmp), encoded_size);
-
     return encoded_size;
+}
+
+
+size_t stegatzy_decode_padding(FILE *fp)
+{
+    t_bitmap *bmp = malloc(sizeof(t_bitmap));
+    read_bitmap_file(fp, bmp);
+    size_t padding_size = padding_check(bmp);
+    size_t offset = get_rowsize(bmp->info_header.width) - padding_size;
+    size_t available_encode_size = get_encode_size(bmp, ENC_TYPE_PAD);
+    size_t decoded_size = 0;
+
+    fseek(fp, bmp->header.pixel_offset, SEEK_SET);
+
+    char *secret = malloc(sizeof(char) * (available_encode_size+1));
+    char *bp = secret;
+    for (; decoded_size < available_encode_size && (!fseek(fp, offset, SEEK_CUR)); ) {
+        fread(secret, padding_size, 1, fp);
+        secret += padding_size;
+        decoded_size += padding_size;
+    }
+    secret = bp;
+    printf("%s\n", secret);
+
+    return decoded_size;
 }
 
 

@@ -26,7 +26,7 @@
 
 void stegatzy_create_bitmap(const char *, int, int, int, char, char, char);
 size_t stegatzy_encode(FILE *, const char *, char);
-void stegatzy_decode();
+void stegatzy_decode(FILE *, char);
 void usage();
 
 
@@ -47,10 +47,10 @@ int main(int argc, char **argv)
 
     } else if (strcmp(argv[CMD], CMD_DECODE) == 0) {
 
-        //FILE *bmpfp = fopen(argv[CMD_BITMAP_FILE], "rb");
+        FILE *bmpfp = fopen(argv[CMD_BITMAP_FILE], "rb");
 
         if (strcmp(argv[CMD_ENC_TYPE], CMD_ENC_TYPE_PAD) == 0) {
-            printf("DECODE PAD\n");
+            stegatzy_decode(bmpfp, ENC_TYPE_PAD);
         } else if (strcmp(argv[CMD_ENC_TYPE], CMD_ENC_TYPE_LSB) == 0) {
             printf("DECODE LSB\n");
         }
@@ -95,7 +95,7 @@ void stegatzy_create_bitmap(
 
 size_t stegatzy_encode(FILE *fp, const char *s, char enc_type)
 {
-    printf("Encoding bmp:\n secret text: %s, enc_type: %d\n", s, enc_type);
+    printf("Encoding bmp:\n enc_type: %d\n", enc_type);
     switch (enc_type) {
         case ENC_TYPE_PAD:
             stegatzy_by_padding(fp, s);
@@ -111,8 +111,16 @@ size_t stegatzy_encode(FILE *fp, const char *s, char enc_type)
 }
 
 
-void stegatzy_decode()
+void stegatzy_decode(FILE *fp, char enc_type)
 {
+    printf("Decoding bmp:\n enc_type: %d\n", enc_type);
+    switch (enc_type) {
+        case ENC_TYPE_PAD:
+            stegatzy_decode_padding(fp);
+            break;
+        default:
+            break;
+    }
 }
 
 
