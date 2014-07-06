@@ -45,6 +45,8 @@ int main(int argc, char **argv)
             stegatzy_encode(bmpfp, argv[CMD_SECRET_TEXT], ENC_TYPE_LSB);
         }
 
+        fclose(bmpfp);
+
     } else if (strcmp(argv[CMD], CMD_DECODE) == 0) {
 
         FILE *bmpfp = fopen(argv[CMD_BITMAP_FILE], "rb");
@@ -52,8 +54,10 @@ int main(int argc, char **argv)
         if (strcmp(argv[CMD_ENC_TYPE], CMD_ENC_TYPE_PAD) == 0) {
             stegatzy_decode(bmpfp, ENC_TYPE_PAD);
         } else if (strcmp(argv[CMD_ENC_TYPE], CMD_ENC_TYPE_LSB) == 0) {
-            printf("DECODE LSB\n");
+            stegatzy_decode(bmpfp, ENC_TYPE_LSB);
         }
+
+        fclose(bmpfp);
 
     } else if (strcmp(argv[CMD], CMD_CREATE) == 0) {
 
@@ -117,6 +121,9 @@ void stegatzy_decode(FILE *fp, char enc_type)
     switch (enc_type) {
         case ENC_TYPE_PAD:
             stegatzy_decode_padding(fp);
+            break;
+        case ENC_TYPE_LSB:
+            stegatzy_decode_lsb(fp);
             break;
         default:
             break;
