@@ -55,10 +55,7 @@ typedef struct {
     char               *name;
 } t_bitmap;
 
-void set_bitmap(t_bitmap *, int);
 int set_bitmap_filename(t_bitmap *, const char *);
-void unset_bitmap(t_bitmap *, int);
-int get_bitmap(t_bitmap *, int);
 t_bitmap *create_bitmap(const char *, int, int, int, t_pixel);
 size_t write_bitmap_file(const char *, t_bitmap *);
 size_t write_bitmap_pixel_data(t_bitmap *, FILE *);
@@ -66,8 +63,6 @@ int read_bitmap_file(FILE *, t_bitmap *);
 int read_bitmap_file_header(t_bitmap *, FILE *);
 int read_bitmap_info_header(t_bitmap *, FILE *);
 int read_bitmap_data(t_bitmap *, FILE *);
-int hide(t_bitmap *, const char *);
-int unhide(t_bitmap *);
 size_t get_rowsize(int);
 size_t get_pixel_array_size(int, int);
 size_t padding_check(t_bitmap *);

@@ -7,12 +7,6 @@
 #include "tzybitmap.h"
 
 
-void set_bitmap(t_bitmap *bmp, int i)
-{
-    printf("set_bitmap\n");
-}
-
-
 int set_bitmap_filename(t_bitmap *bmp, const char *s)
 {
     char *new = malloc(sizeof(char) * strlen(s));
@@ -22,18 +16,6 @@ int set_bitmap_filename(t_bitmap *bmp, const char *s)
     bmp->name = new;
 
     return 0;
-}
-
-
-void unset_bitmap(t_bitmap *bmp, int i)
-{
-    printf("unset_bitmap\n");
-}
-
-
-int get_bitmap(t_bitmap *bmp, int i)
-{
-    return i;
 }
 
 
@@ -253,20 +235,6 @@ int read_bitmap_data(t_bitmap *bmp, FILE *img)
 }
 
 
-int hide(t_bitmap *bmp, const char *s)
-{
-    printf("hide\n");
-    return 0;
-}
-
-
-int unhide(t_bitmap *bmp)
-{
-    printf("unhide\n");
-    return 0;
-}
-
-
 /* return row size in bytes required */
 size_t get_rowsize(int width)
 {
@@ -288,7 +256,7 @@ size_t padding_check(t_bitmap *bmp)
 }
 
 
-void streamout_bitmap(t_bitmap *bmp)
+void print_bitmap_info(t_bitmap *bmp)
 {
     printf("Image: %s\n"
            "===============================================\n"
@@ -319,10 +287,4 @@ void streamout_bitmap(t_bitmap *bmp)
             bmp->info_header.image_size, bmp->info_header.horizontal,
             bmp->info_header.vertical, bmp->info_header.color_palette,
             bmp->info_header.colors_used);
-
-    printf("===============================================\n");
-    size_t i;
-    for (i = 0; i < bmp->info_header.image_size; ++i) {
-        //printf("(%zu): %x, %x, %x\n", i, bmp->pixel[i].blue, bmp->pixel[i].green, bmp->pixel[i].red);
-    }
 }
