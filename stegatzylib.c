@@ -14,6 +14,8 @@ size_t stegatzy_by_padding(FILE *fp, const char *s)
     size_t offset = get_rowsize(bmp->info_header.width) - padding_size;
     size_t available_encode_size = get_encode_size(bmp, ENC_TYPE_PAD);
 
+    printf(" available_encode_size: %zu\n", available_encode_size);
+
     /* set fp offset point to start of pixel offset */
     fseek(fp, bmp->header.pixel_offset, SEEK_SET);
 
@@ -29,6 +31,8 @@ size_t stegatzy_by_padding(FILE *fp, const char *s)
             encoded_size += padding_size;
         }
     }
+
+    printf(" encoded_size: %zu\n", encoded_size);
 
     return encoded_size;
 }
