@@ -146,22 +146,19 @@ size_t write_bitmap_pixel_data(t_bitmap *bmp, FILE *fp)
  * on success, return 0
  * on error, return ENOENT if file isn't available, negative value if reading failed.
  */
-int read_bitmap_file(const char *file, t_bitmap *bmp)
+int read_bitmap_file(FILE *fp, t_bitmap *bmp)
 {
     int ret;
-    FILE *bmpfile = fopen(file, "rb");
-    if (bmpfile == NULL)
+    if (fp == NULL)
         return ENOENT;
-    if ((ret = read_bitmap_file_header(bmp, bmpfile)))
+    if ((ret = read_bitmap_file_header(bmp, fp)))
         return ret;
     if (bmp->header.type != 0x4D42) /* if file ain't bitmap: BM */
         return EFTYPE;
-    if ((ret = read_bitmap_info_header(bmp, bmpfile)))
+    if ((ret = read_bitmap_info_header(bmp, fp)))
         return ret;
-    if ((ret = read_bitmap_data(bmp, bmpfile)))
+    if ((ret = read_bitmap_data(bmp, fp)))
         return ret;
-    if (bmp->name == '\0')
-        set_bitmap_filename(bmp, file);
 
     return 0;
 }
@@ -284,6 +281,7 @@ size_t get_pixel_array_size(int width, int height)
 }
 
 
+/* return total bytes of padding required per row(or width) */
 size_t padding_check(t_bitmap *bmp)
 {
     return get_rowsize(bmp->info_header.width) - (BYTES_PER_PIXEL * bmp->info_header.width);

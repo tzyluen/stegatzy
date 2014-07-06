@@ -62,7 +62,7 @@ int get_bitmap(t_bitmap *, int);
 t_bitmap *create_bitmap(const char *, int, int, int, t_pixel);
 size_t write_bitmap_file(const char *, t_bitmap *);
 size_t write_bitmap_pixel_data(t_bitmap *, FILE *);
-int read_bitmap_file(const char *, t_bitmap *);
+int read_bitmap_file(FILE *, t_bitmap *);
 int read_bitmap_file_header(t_bitmap *, FILE *);
 int read_bitmap_info_header(t_bitmap *, FILE *);
 int read_bitmap_data(t_bitmap *, FILE *);
