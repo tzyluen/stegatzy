@@ -99,19 +99,21 @@ void stegatzy_create_bitmap(
 
 size_t stegatzy_encode(FILE *fp, const char *s, char enc_type)
 {
+    size_t encoded_size = 0;
     printf("Encoding bmp:\n enc_type: %d\n", enc_type);
     switch (enc_type) {
         case ENC_TYPE_PAD:
-            stegatzy_by_padding(fp, s);
+            encoded_size = stegatzy_by_padding(fp, s);
             break;
         case ENC_TYPE_LSB:
-            stegatzy_by_lsb(fp, s);
+            encoded_size = stegatzy_by_lsb(fp, s);
             break;
         default:
             break;
     }
+    printf(" encoded_size: %zu bytes\n", encoded_size);
 
-    return 0;
+    return encoded_size;
 }
 
 
