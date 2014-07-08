@@ -1,33 +1,43 @@
 CXX=gcc
 CXXFLAGS=-std=c99 -O0 -g -Wall
+BITMAPFILE=hello.bmp
+SECRETTEXT=Lisa P's back!
+#WAVFILE=JSBach-Partita-E-major.wav
+WAVFILE=MLKDream.wav
 
 all:
-	$(CXX) $(CXXFLAGS) tzybitmap.c stegatzylib.c -c
-	$(CXX) $(CXXFLAGS) tzybitmap.o stegatzylib.o stegatzy.c -o stegatzy
+	$(CXX) $(CXXFLAGS) tzybitmap.c stegatzylib.c tzywav.c -c
+	$(CXX) $(CXXFLAGS) tzybitmap.o stegatzylib.o tzywav.o stegatzy.c -o stegatzy
 
 clean:
-	rm -f *o a.out stegatzy hello.bmp
+	rm -f *o a.out stegatzy $(BITMAPFILE)
 
-create:
-	./stegatzy create hello.bmp -c 24 401 401 255 255 255
+create_bmp:
+	./stegatzy create $(BITMAPFILE) -c 24 401 401 255 255 255
 
-encode_pad:
-	./stegatzy encode hello.bmp -t pad "Lisa P's back!"
+encode_bmp_pad:
+	./stegatzy encode $(BITMAPFILE) -t bmp -e pad "$(SECRETTEXT)"
 
-encode_lsb:
-	./stegatzy encode hello.bmp -t lsb "Lisa P's back!"
+encode_bmp_lsb:
+	./stegatzy encode $(BITMAPFILE) -t bmp -e lsb "$(SECRETTEXT)"
 
-decode_pad:
-	./stegatzy decode hello.bmp -t pad
+decode_bmp_pad:
+	./stegatzy decode $(BITMAPFILE) -t bmp -e pad
 
-decode_lsb:
-	./stegatzy decode hello.bmp -t lsb
+decode_bmp_lsb:
+	./stegatzy decode $(BITMAPFILE) -t bmp -e lsb
+
+encode_wav_lsb:
+	./stegatzy encode $(WAVFILE) -t wav -e lsb "$(SECRETTEXT)"
+
+decode_wav_lsb:
+	./stegatzy decode $(WAVFILE) -t wav -e lsb
 
 memcheck:
-	valgrind ./stegatzy encode hello.bmp -t pad "untold secret"
+	valgrind ./stegatzy encode $(BITMAPFILE) -t pad "$(SECRETTEXT)"
 
 leakcheck:
-	valgrind --leak-check=full ./stegatzy encode hello.bmp -t pad "untold secret"
+	valgrind --leak-check=full ./stegatzy encode $(BITMAPFILE) -t pad "$(SECRETTEXT)"
 
 fullcheck:
-	valgrind --leak-check=full --track-origin=yes ./stegatzy encode hello.bmp -t pad "untold secret"
+	valgrind --leak-check=full --track-origin=yes ./stegatzy encode $(BITMAPFILE) -t pad "$(SECRETTEXT)"
