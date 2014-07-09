@@ -11,6 +11,7 @@ all:
 
 clean:
 	rm -f *o a.out stegatzy $(BITMAPFILE)
+	rm -f new_MLKDream.wav
 
 create_bmp:
 	./stegatzy create $(BITMAPFILE) -c 24 401 401 255 255 255

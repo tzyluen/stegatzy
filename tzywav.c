@@ -7,13 +7,13 @@
 /**
  * return value:
  * on success, return 0
- * on error, return ENOENT if file isn't available, negative value if reading failed.
+ * on error, return -ENOENT if file isn't available, negative value if reading failed.
  */
 int read_wav_file(FILE *fp, t_wav *wav_f)
 {
     int ret;
     if (fp == NULL)
-        return ENOENT;
+        return -ENOENT;
     if ((ret = read_wav_header(wav_f, fp)))
         return ret;
     if ((ret = read_wav_data(wav_f, fp)))
@@ -22,6 +22,11 @@ int read_wav_file(FILE *fp, t_wav *wav_f)
 }
 
 
+/**
+ * return value:
+ * on success, return 0
+ * on error, return negative value
+ */
 int read_wav_header(t_wav *wav_f, FILE *fp)
 {
     int ret;
@@ -31,14 +36,24 @@ int read_wav_header(t_wav *wav_f, FILE *fp)
 }
 
 
+/**
+ * return value:
+ * on success, return 0
+ * on error, return negative value
+ */
 int read_wav_data(t_wav *wav_f, FILE *fp)
 {
     int ret;
-    byte *sampled_data = malloc(wav_f->header.subchunk2_size);
+    uint8_t *sampled_data = malloc(wav_f->header.subchunk2_size);
     if (sampled_data == NULL)
-        return ENOMEM;
-    if ((ret = fread(&wav_f->sampled_data, 1, sizeof(&wav_f->header.subchunk2_size), fp)) < 0)
+        return -ENOMEM;
+    if ((ret = fread(sampled_data, 1, wav_f->header.subchunk2_size, fp)) < wav_f->header.subchunk2_size)
+        return -EOVERFLOW;
+    else if (ret != wav_f->header.subchunk2_size)
         return ret;
+
+    wav_f->sampled_data = sampled_data;
+
     return 0;
 }
 
