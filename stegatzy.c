@@ -6,63 +6,81 @@
 #include "tzybitmap.h"
 #include "stegatzylib.h"
 
-#define CMD                    1
-#define CMD_BITMAP_FILE        2
-#define CMD_ENCODE             "encode"
-#define CMD_DECODE             "decode"
-#define CMD_CREATE             "create"
-#define CMD_ENC_TYPE_PAD       "pad"
-#define CMD_ENC_TYPE_LSB       "lsb"
-#define CMD_OPT                3
-#define CMD_ENC_TYPE           4
-#define CMD_BITMAP_DEPTH       4
-#define CMD_BITMAP_WIDTH       5
-#define CMD_BITMAP_HEIGHT      6
-#define CMD_BITMAP_R           7
-#define CMD_BITMAP_G           8
-#define CMD_BITMAP_B           9
-#define CMD_SECRET_TEXT        5
+/* program's **argv index */
+#define CMD                         1
+#define CMD_COVER_FILE              2
+#define CMD_COVER_FILE_OPT          3
+#define CMD_BITMAP_CREATE           3
+#define CMD_COVER_FILE_TYPE         4
+#define CMD_ENC_OPT                 5
+#define CMD_ENC_TYPE                6
+#define CMD_BITMAP_DEPTH            4
+#define CMD_BITMAP_WIDTH            5
+#define CMD_BITMAP_HEIGHT           6
+#define CMD_BITMAP_R                7
+#define CMD_BITMAP_G                8
+#define CMD_BITMAP_B                9
+#define CMD_SECRET_TEXT             7
+
+/* program's parameters constants */
+#define CMD_ENCODE                  "encode"
+#define CMD_DECODE                  "decode"
+#define CMD_CREATE                  "create"
+#define CMD_ENC_TYPE_PAD            "pad"
+#define CMD_ENC_TYPE_LSB            "lsb"
+#define BMP                         "bmp"
+#define WAV                         "wav"
 
 
 void stegatzy_create_bitmap(const char *, int, int, int, char, char, char);
-size_t stegatzy_encode(FILE *, const char *, char);
-void stegatzy_decode(FILE *, char);
+size_t stegatzy_encode(FILE *, const char *, char, char, char *);
+void stegatzy_decode(FILE *, char, char);
+char *get_new_file_name(char *);
 void usage();
 
 
 int main(int argc, char **argv)
 {
-    if (argc < 4)
+    if (argc < 6)
         usage();
 
-    if (strcmp(argv[CMD], CMD_ENCODE) == 0) {
+    int cover_type, enc_type;
+    char *ofn;
+    if ( (strcmp(argv[CMD], CMD_ENCODE) == 0) || (strcmp(argv[CMD], CMD_DECODE) == 0) ) {
 
-        FILE *bmpfp = fopen(argv[CMD_BITMAP_FILE], "r+");
-
-        if (strcmp(argv[CMD_ENC_TYPE], CMD_ENC_TYPE_PAD) == 0) {
-            stegatzy_encode(bmpfp, argv[CMD_SECRET_TEXT], ENC_TYPE_PAD);
-        } else if (strcmp(argv[CMD_ENC_TYPE], CMD_ENC_TYPE_LSB) == 0) {
-            stegatzy_encode(bmpfp, argv[CMD_SECRET_TEXT], ENC_TYPE_LSB);
+        FILE *bmpfp = fopen(argv[CMD_COVER_FILE], "r+");
+        if (! bmpfp) {
+            ERROR_PRINT_ERR
+            return errno;
         }
 
-        fclose(bmpfp);
+        ofn = get_new_file_name(argv[CMD_COVER_FILE]);
 
-    } else if (strcmp(argv[CMD], CMD_DECODE) == 0) {
+        if (strcmp(argv[CMD_COVER_FILE_OPT], "-t") == 0) {
+            cover_type = (strcmp(argv[CMD_COVER_FILE_TYPE], BMP) == 0) ? COVER_TYPE_BMP : COVER_TYPE_WAV;
+            enc_type = (strcmp(argv[CMD_ENC_TYPE], "pad") == 0) ? ENC_TYPE_PAD : ENC_TYPE_LSB;
 
-        FILE *bmpfp = fopen(argv[CMD_BITMAP_FILE], "rb");
+            if ( (strcmp(argv[CMD_COVER_FILE_TYPE], WAV) == 0) && (enc_type == ENC_TYPE_PAD) ) {
+                printf(" WAV - doesn't supports -e pad\n");
+                usage();
+            }
 
-        if (strcmp(argv[CMD_ENC_TYPE], CMD_ENC_TYPE_PAD) == 0) {
-            stegatzy_decode(bmpfp, ENC_TYPE_PAD);
-        } else if (strcmp(argv[CMD_ENC_TYPE], CMD_ENC_TYPE_LSB) == 0) {
-            stegatzy_decode(bmpfp, ENC_TYPE_LSB);
+            if (strcmp(argv[CMD], CMD_ENCODE) == 0)
+                stegatzy_encode(bmpfp, argv[CMD_SECRET_TEXT], cover_type, enc_type, ofn);
+            else
+                stegatzy_decode(bmpfp, cover_type, enc_type);
+
+        } else {
+            printf(" Invalid opt: %s\n", argv[CMD_COVER_FILE_OPT]);
+            usage();
         }
 
         fclose(bmpfp);
 
     } else if (strcmp(argv[CMD], CMD_CREATE) == 0) {
-
-        if (strcmp(argv[CMD_OPT], "-c") == 0) {
-            stegatzy_create_bitmap(  argv[CMD_BITMAP_FILE],
+	    // stegatzy create $(BITMAPFILE) -c 24 401 401 255 255 255
+        if (strcmp(argv[CMD_BITMAP_CREATE], "-c") == 0) {
+            stegatzy_create_bitmap(  argv[CMD_COVER_FILE],
                                      strtol(argv[CMD_BITMAP_WIDTH], NULL, 10),
                                      strtol(argv[CMD_BITMAP_HEIGHT], NULL, 10),
                                      strtol(argv[CMD_BITMAP_DEPTH], NULL, 10),
@@ -97,16 +115,20 @@ void stegatzy_create_bitmap(
 }
 
 
-size_t stegatzy_encode(FILE *fp, const char *s, char enc_type)
+size_t stegatzy_encode(FILE *fp, const char *s, char cover_type, char enc_type, char *ofn)
 {
     size_t encoded_size = 0;
-    printf("Encoding bmp:\n enc_type: %d\n", enc_type);
+
     switch (enc_type) {
         case ENC_TYPE_PAD:
-            encoded_size = stegatzy_by_padding(fp, s);
+            if (cover_type == COVER_TYPE_BMP)
+                encoded_size = stegatzy_bmp_by_padding(fp, s);
             break;
         case ENC_TYPE_LSB:
-            encoded_size = stegatzy_by_lsb(fp, s);
+            if (cover_type == COVER_TYPE_BMP)
+                encoded_size = stegatzy_bmp_by_lsb(fp, s);
+            else
+                encoded_size = stegatzy_wav_by_lsb(fp, s, ofn);
             break;
         default:
             break;
@@ -117,15 +139,18 @@ size_t stegatzy_encode(FILE *fp, const char *s, char enc_type)
 }
 
 
-void stegatzy_decode(FILE *fp, char enc_type)
+void stegatzy_decode(FILE *fp, char cover_type, char enc_type)
 {
-    printf("Decoding bmp:\n enc_type: %d\n", enc_type);
     switch (enc_type) {
         case ENC_TYPE_PAD:
-            stegatzy_decode_padding(fp);
+            if (cover_type == COVER_TYPE_BMP)
+                stegatzy_bmp_decode_padding(fp);
             break;
         case ENC_TYPE_LSB:
-            stegatzy_decode_lsb(fp);
+            if (cover_type == COVER_TYPE_BMP)
+                stegatzy_bmp_decode_lsb(fp);
+            else
+                stegatzy_wav_decode_lsb(fp);
             break;
         default:
             break;
@@ -133,13 +158,24 @@ void stegatzy_decode(FILE *fp, char enc_type)
 }
 
 
+char *get_new_file_name(char *old)
+{
+    char *prefix = "new_";
+    char *new = malloc(strlen(old) + strlen(prefix) + 1);
+    strcpy(new, prefix);
+    strcat(new, old);
+
+    return new;
+}
+
+
 void usage()
 {
     printf("usage:\n  stegatzy <command> args\n");
     printf("Example,\n");
-    printf("  stegatzy encode <bitmap file> -t [pad|lsb] \"secret message\"\n");
-    printf("  stegatzy decode <bitmap file> -t [pad|lsb]\n");
-    printf("  stegatzy create <bitmap file> -c <depth:[8|16|24|32]> <W> <H> <R> <G> <B>\n");
+    printf("  stegatzy encode [bitmap|wav file] -t [bmp|wav] -e [pad|lsb] \"secret message\"\n");
+    printf("  stegatzy decode [bitmap|wav file] -t [bmp|wav] -e [pad|lsb]\n");
+    printf("  stegatzy create [bitmap file] -c <depth:[8|16|24|32]> <W> <H> <R> <G> <B>\n");
 
     exit(1);
 }
