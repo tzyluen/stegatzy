@@ -12,11 +12,11 @@ Reference
 
 Sample bmp files
 ----------------
-1. Bruce Lee (good medium, lot of image noise)
-2. IP Man
+1. _Bruce Lee_ (good medium, lot of image noise)
+2. _IP Man_
 
 Sample wav files
 ----------------
-1. Martin Luther King Jr; _I_have_a_Dream_. From https://archive.org/download/MLKDream/MLKDream.wav (**PCM**)
-2. J.S. Bach; _Partita_E_Major,_Gavotte_en_rondeau_. From http://www.music.helsinki.fi/tmt/opetus/uusmedia/esim/a2002011001-e02.wav (**Non-PCM**)
+1. Martin Luther King Jr; _I have a Dream_. From https://archive.org/download/MLKDream/MLKDream.wav (**PCM**)
+2. J.S. Bach; _Partita E Major, Gavotte en rondeau_. From http://www.music.helsinki.fi/tmt/opetus/uusmedia/esim/a2002011001-e02.wav (**Non-PCM**)
 3. (**Microsoft Extensible Format**)
