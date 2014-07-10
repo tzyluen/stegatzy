@@ -204,26 +204,42 @@ size_t stegatzy_wav_by_lsb(FILE *fp, const char *s, const char *ofn)
     t_wav *wav_f = malloc(sizeof(t_wav));
     if ((ret = read_wav_file(fp, wav_f)))
         ERROR_PRINT_ERR;
-    print_wav_info(wav_f);
+    //print_wav_info(wav_f);
+    size_t encoded_size = 0;
 
     FILE *sfp = fopen(ofn, "w+");
-
     /* write the wav file header */
     char *header = malloc(PCM_DATA_HEADER_OFFSET);  // first 44 bytes; FIXME: Non-PCM different offset
     rewind(fp);
     fread(header, 1, PCM_DATA_HEADER_OFFSET, fp);
     fwrite(header, 1, PCM_DATA_HEADER_OFFSET, sfp);
 
+    /* write/store the number of bytes to cipher, pixel's data first 32 bytes sequence(1 bit each) */
+    size_t slen = strlen(s);
+    byte b;     /* temporary byte to read & write the LSBit */
+    int i, j, bitpos;   /* indices */
+    int k = 0;          /* store the bytes used(offset) for encoding */
+    unsigned char low = 0;  /* low order byte: true|false */
+    for (bitpos = 32 - 1; bitpos >= 0; /* NOTE: empty */ ) {
+        b = *wav_f->sampled_data;
+
+        if (low) {
+            set_bit(&b, 0, !!(slen & (1 << bitpos)));
+            --bitpos;
+        }
+
+        fwrite(&b, sizeof(b), 1, sfp);
+        ++wav_f->sampled_data;
+        ++k;
+        low = !low;
+    }
+
     /* write the wav data contents */
-    void str_to_binary(const char *, uint8_t **);
-    uint8_t **dest = malloc(strlen(s) * sizeof(uint8_t));
+    uint8_t **dest = malloc(slen * sizeof(uint8_t *));
     str_to_binary(s, dest);
 
-    int i, j, k = 0;
     uint8_t s_sample;
-    size_t encoded_size = 0;
-    unsigned char low = 0;  /* low order byte */
-    for (i = 0; i < strlen(s); ++i) {
+    for (i = 0; i < slen; ++i) {
         j = 0;
         while ( (j <= 7) && (k < wav_f->header.subchunk2_size) ) {
             s_sample = *wav_f->sampled_data;
@@ -249,9 +265,9 @@ size_t stegatzy_wav_by_lsb(FILE *fp, const char *s, const char *ofn)
     fseek(fp, wav_f->header.subchunk2_size, SEEK_CUR);
 
     /* write the remaining additional footer */
-    uint8_t byte = 0;
-    while (fread(&byte, 1, sizeof(uint8_t), fp) == sizeof(uint8_t))
-        fwrite(&byte, 1, sizeof(uint8_t), sfp);
+    b = 0;
+    while (fread(&b, 1, sizeof(byte), fp) == sizeof(byte))
+        fwrite(&b, 1, sizeof(byte), sfp);
 
     ERROR_PRINT_ERR
     fclose(sfp);
@@ -262,14 +278,73 @@ size_t stegatzy_wav_by_lsb(FILE *fp, const char *s, const char *ofn)
 
 size_t stegatzy_wav_decode_lsb(FILE *fp)
 {
-    return 0;
+    int ret = 0;
+    t_wav *wav_f = malloc(sizeof(t_wav));
+    if ((ret = read_wav_file(fp, wav_f)))
+        return ret;
+
+    byte bp;   /* temporary byte to hold a byte to retrieve the LSBit */
+    byte bq;   /* temporary byte to hold the 8 retrieved bits before concat to secret string `ssp' */
+    char *ss, *ssp;     /* pointer to the secret string */
+    int8_t bitpos;      /* current bit position offset */
+    unsigned char low = 0;  /* low order byte: true|false */
+    size_t decoded_size;
+    uint32_t encoded_size;
+
+    fseek(fp, PCM_DATA_HEADER_OFFSET, SEEK_SET);
+
+    /* read the first 64 bytes to get total encoded secret bytes */
+    encoded_size = 0;
+    for (bitpos = 31; bitpos >= 0; /* NOTE: empty */) {
+        fread(&bp, sizeof(byte), 1, fp);
+
+        if (low) {
+            uint8_t bit = get_bit(&bp, 0);
+            set_bit32(&encoded_size, bitpos, bit);
+            --bitpos;
+        }
+
+        low = !low;
+    }
+    printf("(%d) encoded_size: %"PRId32"\n", __LINE__, encoded_size);
+
+    //ss = malloc(wav_f->header.subchunk2_size / 2);
+    ss = malloc(encoded_size + 1);
+    ssp = ss;
+
+    bp = bq = low = bitpos = decoded_size = 0;
+    while (fread(&bp, 1, 1, fp) >= 1 && decoded_size <= encoded_size) {
+        //printf("(%d) %#010x\n", __LINE__, bp);
+        if (low) {
+            //printf("(%d) %#010x\n", __LINE__, bp);
+            //set_bit(&bq, bitpos, get_bit(&bp, 0));
+            uint8_t bit = get_bit(&bp, 0);
+            //printf("%d", bit);
+            set_bit(&bq, bitpos, bit);
+            ++bitpos;
+            if (bitpos > 7) {
+                *ss = bq;
+                ++ss;
+                bitpos = 0;     /* reset */
+                //printf("%c\n", *ss);
+                ++decoded_size;
+            }
+        }
+
+        low = !low;
+    }
+    ss = ssp;
+    printf(" %s\n", ss);
+
+    return decoded_size;
 }
 
 
-/* set|toggle bit `b' bit at position `i' to `b':
+/**
+ * set|toggle bit `b' bit at position `i' to `b':
  * [7|6|5|4|3|2|1|0]
- *                ^ <- starting index/position
- * return 0 on success, non-zero on error
+ *                ^- starting index/position
+ *  return 0 on success, non-zero on error
  */
 int set_bit(byte *bp, uint8_t i, uint8_t b)
 {

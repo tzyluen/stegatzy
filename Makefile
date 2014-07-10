@@ -11,7 +11,7 @@ all:
 
 clean:
 	rm -f *o a.out stegatzy $(BITMAPFILE)
-	rm -f new_MLKDream.wav
+	rm -f new_*.wav
 
 create_bmp:
 	./stegatzy create $(BITMAPFILE) -c 24 401 401 255 255 255
@@ -32,7 +32,7 @@ encode_wav_lsb:
 	./stegatzy encode $(WAVFILE) -t wav -e lsb "$(SECRETTEXT)"
 
 decode_wav_lsb:
-	./stegatzy decode $(WAVFILE) -t wav -e lsb
+	./stegatzy decode new_$(WAVFILE) -t wav -e lsb
 
 memcheck:
 	valgrind ./stegatzy encode $(BITMAPFILE) -t pad "$(SECRETTEXT)"

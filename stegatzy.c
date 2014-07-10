@@ -141,13 +141,16 @@ size_t stegatzy_encode(FILE *fp, const char *s, char cover_type, char enc_type, 
 
 void stegatzy_decode(FILE *fp, char cover_type, char enc_type)
 {
-    printf("Decoding bmp:\n enc_type: %d\n", enc_type);
     switch (enc_type) {
         case ENC_TYPE_PAD:
-            stegatzy_bmp_decode_padding(fp);
+            if (cover_type == COVER_TYPE_BMP)
+                stegatzy_bmp_decode_padding(fp);
             break;
         case ENC_TYPE_LSB:
-            stegatzy_bmp_decode_lsb(fp);
+            if (cover_type == COVER_TYPE_BMP)
+                stegatzy_bmp_decode_lsb(fp);
+            else
+                stegatzy_wav_decode_lsb(fp);
             break;
         default:
             break;
