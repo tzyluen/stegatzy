@@ -1,3 +1,7 @@
+/**
+ * Stegatzy
+ * Copyright (C) 2014 Ng Tzy Luen. All Rights Reserved.
+ */
 #ifndef STEGATZYLIB_H
 #define STEGATZYLIB_H
 

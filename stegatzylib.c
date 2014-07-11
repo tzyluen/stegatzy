@@ -1,3 +1,7 @@
+/**
+ * Stegatzy
+ * Copyright (C) 2014 Ng Tzy Luen. All Rights Reserved.
+ */
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
