@@ -4,17 +4,17 @@ Steganography implementation.
 
 Demo
 ----
-Encode a bitmap image file
+Encode a bitmap image file with LSB method:
 ![alt tag](https://raw.github.com/tzyluen/stegatzy/master/img/stegatzy-encode-bmp-lsb1.png)
 
-Decode a bitmap image file
+Decode the LSB encoded bitmap image file:
 ![alt tag](https://raw.github.com/tzyluen/stegatzy/master/img/stegatzy-decode-bmp-lsb1.png)
 
 Original image file:                                                                | Encoded image file:
 :----------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------:
 ![alt tag](https://raw.github.com/tzyluen/stegatzy/master/img/brucelee.before.bmp)  | ![alt tag](https://raw.github.com/tzyluen/stegatzy/master/img/brucelee.after.bmp)
 
-Encode and decode a wav file
+Encode and decode a wav file (LSB):
 ![alt tag](https://raw.github.com/tzyluen/stegatzy/master/img/stegatzy-encode-decode-wav-lsb1.png)
 
 Before and after wav files waveform:
