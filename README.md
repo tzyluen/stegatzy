@@ -10,7 +10,7 @@ Encode a bitmap image file
 Decode a bitmap image file
 ![alt tag](https://raw.github.com/tzyluen/stegatzy/master/img/stegatzy-decode-bmp-lsb1.png)
 
-Before decode image file:                                                           | After encoded image file:
+Original image file:                                                                | Encoded image file:
 :----------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------:
 ![alt tag](https://raw.github.com/tzyluen/stegatzy/master/img/brucelee.before.bmp)  | ![alt tag](https://raw.github.com/tzyluen/stegatzy/master/img/brucelee.after.bmp)
 
