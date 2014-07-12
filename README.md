@@ -2,6 +2,26 @@ Stegatzy
 ========
 Steganography implementation.
 
+Demo
+----
+Encode a bitmap image file
+![alt tag](https://raw.github.com/tzyluen/stegatzy/master/img/stegatzy-encode-bmp-lsb1.png)
+
+Decode a bitmap image file
+![alt tag](https://raw.github.com/tzyluen/stegatzy/master/img/stegatzy-decode-bmp-lsb1.png)
+
+Before and after raw image files
+![alt tag](https://raw.github.com/tzyluen/stegatzy/master/img/brucelee.before.bmp)
+![alt tag](https://raw.github.com/tzyluen/stegatzy/master/img/brucelee.after.bmp)
+
+Encode and decode a wav file
+![alt tag](https://raw.github.com/tzyluen/stegatzy/master/img/stegatzy-encode-decode-wav-lsb1.png)
+
+Before and after wav files waveform:
+![alt tag](https://raw.github.com/tzyluen/stegatzy/master/img/stegatzy-wav-lsb-before-after.png)
+
+
+
 Reference
 ---------
 1. http://en.wikipedia.org/wiki/BMP_file_format
