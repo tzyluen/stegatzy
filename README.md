@@ -10,9 +10,9 @@ Encode a bitmap image file
 Decode a bitmap image file
 ![alt tag](https://raw.github.com/tzyluen/stegatzy/master/img/stegatzy-decode-bmp-lsb1.png)
 
-Before and after raw image files
-![alt tag](https://raw.github.com/tzyluen/stegatzy/master/img/brucelee.before.bmp)
-![alt tag](https://raw.github.com/tzyluen/stegatzy/master/img/brucelee.after.bmp)
+Before decode image file:                                                           | After encoded image file:
+:----------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------:
+![alt tag](https://raw.github.com/tzyluen/stegatzy/master/img/brucelee.before.bmp)  | ![alt tag](https://raw.github.com/tzyluen/stegatzy/master/img/brucelee.after.bmp)
 
 Encode and decode a wav file
 ![alt tag](https://raw.github.com/tzyluen/stegatzy/master/img/stegatzy-encode-decode-wav-lsb1.png)
