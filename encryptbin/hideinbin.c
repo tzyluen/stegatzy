@@ -147,7 +147,7 @@ int stitch(FILE *dest_fp, FILE *src_fp)
 /**
  * tampered executable binary file format structure:
  *
- * |--------------| EOF |--------------| |---<int 4 Bytes>---| |16Bytes|
+ * |--------------| EOF |--------------| |--<size_t Bytes>---| |16Bytes|
  * [Coverfile Data]  \0 [Encrypted Data] [Encrypted Data Size] [IV Keys]
  */
 int unstitch(FILE *dest_fp, FILE *src_fp, bool truncate)

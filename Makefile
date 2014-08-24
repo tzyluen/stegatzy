@@ -2,8 +2,8 @@ CXX=gcc
 CXXFLAGS=-std=c99 -O0 -g -Wall
 BITMAPFILE=hello.bmp
 SECRETTEXT=Lisa P's back!
-#WAVFILE=JSBach-Partita-E-major.wav
-WAVFILE=MLKDream.wav
+#WAVFILE=assets/JSBach-Partita-E-major.wav
+WAVFILE=assets/MLKDream.wav
 
 all:
 	$(CXX) $(CXXFLAGS) tzybitmap.c stegatzylib.c tzywav.c -c
